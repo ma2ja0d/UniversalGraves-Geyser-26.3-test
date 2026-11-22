@@ -37,11 +37,6 @@ public class GraveUtilsCreateGraveMixin {
     }
 
     private static void scheduleRetry(Runnable task, int remainingAttempts) {
-        BedrockGravesAddon.DO_ON_NEXT_TICK.add(new Runnable() {
-            @Override
-            public void run() {
-                runWithRetry(task, remainingAttempts);
-            }
-        });
+        BedrockGravesAddon.DO_ON_NEXT_TICK.add(() -> runWithRetry(task, remainingAttempts));
     }
 }

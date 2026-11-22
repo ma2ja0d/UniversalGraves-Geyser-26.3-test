@@ -16,10 +16,11 @@ Universal Graves uses Polymer to render custom grave blocks and GUIs for Java pl
 
 ## Requirements
 
-- Minecraft Java `1.21.11`
-- Fabric Loader `0.18.6` or newer
+- Minecraft Java `26.3`
+- Java 25
+- Fabric Loader `0.19.0` or newer
 - Fabric API
-- Universal Graves `3.10.2+1.21.11`
+- Universal Graves `3.13.0+26.3` or newer (needs Polymer, which it already requires)
 - Geyser
 - Floodgate, recommended for Bedrock player detection
 
@@ -71,13 +72,13 @@ Include:
 
 Built jars are written to `build/libs`.
 
-The build uses Java 21.
+The build uses Java 25 and Fabric Loom for unobfuscated Minecraft (26.x). Source uses Mojang names, not Yarn.
 
 ## Releasing
 
 1. Commit the release changes.
 2. Create and push a tag such as `v1.0.1-beta.2` for a beta or `v1.0.1` for a stable release.
-3. GitHub Actions builds the jars on Java 21 and attaches them to the GitHub release.
+3. GitHub Actions builds the jars on Java 25 and attaches them to the GitHub release.
 
 Tags containing `beta`, `alpha`, or `rc` are published as prereleases.
 

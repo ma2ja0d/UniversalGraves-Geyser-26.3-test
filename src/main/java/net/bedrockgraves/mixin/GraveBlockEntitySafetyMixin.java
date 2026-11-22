@@ -3,10 +3,10 @@ package net.bedrockgraves.mixin;
 import eu.pb4.graves.grave.Grave;
 import eu.pb4.graves.registry.GraveBlockEntity;
 import net.bedrockgraves.BedrockGravesAddon;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -19,14 +19,13 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(GraveBlockEntity.class)
 public class GraveBlockEntitySafetyMixin {
     @Redirect(
-            method = "tick(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Lnet/minecraft/block/entity/BlockEntity;)V",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;setBlockState(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;)Z", ordinal = 0),
-            remap = true)
-    private static boolean bedrockgraves$skipSelfDestruct(World world, BlockPos pos, BlockState state) {
-        BlockEntity be = world.getBlockEntity(pos);
+            method = "tick(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/entity/BlockEntity;)V",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;setBlockAndUpdate(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Z", ordinal = 0))
+    private static boolean bedrockgraves$skipSelfDestruct(Level level, BlockPos pos, BlockState state) {
+        BlockEntity be = level.getBlockEntity(pos);
         if (!(be instanceof GraveBlockEntity gbe)) {
             // Not a grave block entity, allow the state change
-            return world.setBlockState(pos, state);
+            return level.setBlockAndUpdate(pos, state);
         }
 
         Grave grave = gbe.getGrave();
@@ -38,7 +37,7 @@ public class GraveBlockEntitySafetyMixin {
 
         if (grave.isRemoved()) {
             // Grave is legitimately removed (player collected items), allow destruction
-            return world.setBlockState(pos, state);
+            return level.setBlockAndUpdate(pos, state);
         }
 
         // Grave exists but isn't marked as removed - skip destruction

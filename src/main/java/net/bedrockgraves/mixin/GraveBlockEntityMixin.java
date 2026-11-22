@@ -2,12 +2,12 @@ package net.bedrockgraves.mixin;
 
 import eu.pb4.graves.registry.GraveBlockEntity;
 import net.bedrockgraves.overlay.BedrockOverlayManager;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -19,16 +19,17 @@ public abstract class GraveBlockEntityMixin extends BlockEntity {
     }
 
     @Inject(method = "tick", at = @At("TAIL"))
-    private static <T extends BlockEntity> void bedrockgraves$tick(World world, BlockPos pos, BlockState state, T t, CallbackInfo ci) {
-        if (!world.isClient() && t instanceof GraveBlockEntity gbe) {
+    private static <T extends BlockEntity> void bedrockgraves$tick(Level level, BlockPos pos, BlockState state, T t, CallbackInfo ci) {
+        if (!level.isClientSide() && t instanceof GraveBlockEntity gbe) {
             BedrockOverlayManager.tick(gbe);
         }
     }
 
-    @Inject(method = "onBlockReplaced", at = @At("HEAD"))
-    private void bedrockgraves$onReplaced(BlockPos pos, BlockState oldState, CallbackInfo ci) {
-        if (this.world != null && !this.world.isClient()) {
-            BedrockOverlayManager.clearForWorld((net.minecraft.server.world.ServerWorld) this.world, pos);
+    // In 26.x this replaces the old "onBlockReplaced" hook
+    @Inject(method = "preRemoveSideEffects", at = @At("HEAD"))
+    private void bedrockgraves$onRemoved(BlockPos pos, BlockState oldState, CallbackInfo ci) {
+        if (this.level instanceof ServerLevel serverLevel) {
+            BedrockOverlayManager.clearForWorld(serverLevel, pos);
         }
     }
 }
