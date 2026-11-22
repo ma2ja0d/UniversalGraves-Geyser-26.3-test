@@ -6,7 +6,7 @@
     "GraveBlockEntityMixin",
     "GraveBlockEntitySafetyMixin",
     "GraveUtilsCreateGraveMixin",
-    "ServerPlayNetworkHandlerMixin"
+    "ServerCommonPacketListenerMixin"
   ],
   "client": [],
   "injectors": {
